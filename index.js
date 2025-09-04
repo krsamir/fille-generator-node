@@ -107,7 +107,7 @@ yargs.command({
   describe: "Remove Generated Files",
   handler(args) {
     log("Removing Files.");
-    const files = ["controller.js", "service.js"];
+    const files = ["controller.js", "service.js", "validator.js"];
     files.forEach((file) => {
       fs.access(file, fs.constants.F_OK, (err) => {
         if (err) {
@@ -122,6 +122,44 @@ yargs.command({
           });
         }
       });
+    });
+  },
+});
+
+yargs.command({
+  command: "_validator",
+  describe: "Generate Validator File",
+  handler(args) {
+    const service = args.service || CONTROLLER_NAME || "";
+    const name = args.name || CONTROLLER_FUNCTION_NAME || "";
+    log("🚀 ~ args:", {
+      CONTROLLER_NAME,
+      CONTROLLER_FUNCTION_NAME,
+    });
+    const content = ` 
+  ${name}() {
+    return {
+      [Segments.BODY]: Joi.object({
+        id: Joi.string().required(),
+        email: Joi.string().required(),
+        email: Joi.string().optional().allow("").allow(null),
+        isActive: Joi.number().optional().allow(null),
+      }),
+    };
+  }
+    `;
+    fs.writeFile("./validator.js", content, (err) => {
+      if (err) {
+        console.error("Error writing file:", err);
+      } else {
+        log(
+          "----------------------------------------------------------------------------------------------------------------"
+        );
+        log(content);
+        log(
+          "----------------------------------------------------------------------------------------------------------------"
+        );
+      }
     });
   },
 });
