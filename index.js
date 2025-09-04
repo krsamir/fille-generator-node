@@ -15,6 +15,8 @@ const CONTROLLER_FUNCTION_NAME = process.env.CONTROLLER_FUNCTION_NAME;
 const SERVICE_NAME = process.env.SERVICE_NAME;
 const SERVICE_FUNCTION_NAME = process.env.SERVICE_FUNCTION_NAME;
 
+const TABLE_NAME = process.env.TABLE_NAME;
+
 yargs.command({
   command: "create_service",
   describe: "--name, --service",
@@ -26,7 +28,7 @@ yargs.command({
     async ${name}({}) {
     try {
       logger.info(\`${service}.${name} called :\`);
-      return knex({ENVIRONMENT.KNEX_SCHEMA}.CONSTANTS.TABLES.MASTER)
+      return knex(\`\${ENVIRONMENT.KNEX_SCHEMA}.\${CONSTANTS.TABLES.${TABLE_NAME}}\`)
     } catch (error) {
       logger.error(\`
         ${service}.${name}: Error occurred : \${inspect(error)}\`
@@ -56,13 +58,16 @@ yargs.command({
   handler(args) {
     const service = args.service || CONTROLLER_NAME || "";
     const name = args.name || CONTROLLER_FUNCTION_NAME || "";
-    log("🚀 ~ args:", { CONTROLLER_NAME, CONTROLLER_FUNCTION_NAME });
+    log("🚀 ~ args:", {
+      CONTROLLER_NAME,
+      CONTROLLER_FUNCTION_NAME,
+    });
     const content = `
   async ${name}(req, res) {
     const {} = req.body;
     try {
       logger.info(\`${service}.${name} called :\`);
-      const data = await ${service}.${name}({});
+      const data = await ${SERVICE_NAME}.${name}({});
       if (data === 1) {
         return res.status(RESPONSE_STATUS.OK_200).send({
           message: "",
