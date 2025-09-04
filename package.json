@@ -7,10 +7,12 @@
   "scripts": {
     "start": "node index.js",
     "help": "node index.js --help",
-    "_service": "node index.js create_service",
-    "_controller": "node index.js _controller"
+    "s": "node index.js create_service",
+    "c": "node index.js _controller",
+    "d": "node index.js _remove_file"
   },
   "dependencies": {
+    "dotenv": "^17.2.2",
     "yargs": "17.7.2"
   }
 }

@@ -1,19 +1,27 @@
 import fs from "fs";
+import env from "dotenv";
 import _yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
 const yargs = _yargs(hideBin(process.argv));
 yargs.version("1.0.0");
+env.config();
 
 const log = console.log;
+
+const CONTROLLER_NAME = process.env.CONTROLLER_NAME;
+const CONTROLLER_FUNCTION_NAME = process.env.CONTROLLER_FUNCTION_NAME;
+
+const SERVICE_NAME = process.env.SERVICE_NAME;
+const SERVICE_FUNCTION_NAME = process.env.SERVICE_FUNCTION_NAME;
 
 yargs.command({
   command: "create_service",
   describe: "--name, --service",
   handler(args) {
-    console.log("🚀 ~ args:", args.name);
-    const service = args.service;
-    const name = args.name;
+    log("🚀 ~ args:", { SERVICE_NAME, SERVICE_FUNCTION_NAME });
+    const service = args.service || SERVICE_NAME || "";
+    const name = args.name || SERVICE_FUNCTION_NAME || "";
     const content = `
     async ${name}({}) {
     try {
@@ -30,11 +38,11 @@ yargs.command({
       if (err) {
         console.error("Error writing file:", err);
       } else {
-        console.info(
+        log(
           "----------------------------------------------------------------------------------------------------------------"
         );
-        console.log(content);
-        console.info(
+        log(content);
+        log(
           "----------------------------------------------------------------------------------------------------------------"
         );
       }
@@ -46,9 +54,9 @@ yargs.command({
   command: "_controller",
   describe: "--name, --service",
   handler(args) {
-    console.log("🚀 ~ args:", args.name);
-    const service = args.service;
-    const name = args.name;
+    const service = args.service || CONTROLLER_NAME || "";
+    const name = args.name || CONTROLLER_FUNCTION_NAME || "";
+    log("🚀 ~ args:", { CONTROLLER_NAME, CONTROLLER_FUNCTION_NAME });
     const content = `
   async ${name}(req, res) {
     const {} = req.body;
@@ -77,11 +85,11 @@ yargs.command({
       if (err) {
         console.error("Error writing file:", err);
       } else {
-        console.info(
+        log(
           "----------------------------------------------------------------------------------------------------------------"
         );
-        console.log(content);
-        console.info(
+        log(content);
+        log(
           "----------------------------------------------------------------------------------------------------------------"
         );
       }
@@ -89,4 +97,27 @@ yargs.command({
   },
 });
 
+yargs.command({
+  command: "_remove_file",
+  describe: "Remove Generated Files",
+  handler(args) {
+    log("Removing Files.");
+    const files = ["controller.js", "service.js"];
+    files.forEach((file) => {
+      fs.access(file, fs.constants.F_OK, (err) => {
+        if (err) {
+          console.log(`${file} does not exist, skipping...`);
+        } else {
+          fs.unlink(file, (err) => {
+            if (err) {
+              console.error(`Error deleting ${file}:`, err);
+            } else {
+              console.log(`${file} deleted successfully!`);
+            }
+          });
+        }
+      });
+    });
+  },
+});
 yargs.parse();
