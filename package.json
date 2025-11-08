@@ -10,7 +10,8 @@
     "s": "node index.js create_service",
     "c": "node index.js _controller",
     "d": "node index.js _remove_file",
-    "v": "node index.js _validator"
+    "v": "node index.js _validator",
+    "all": "npm run s && npm run c && npm run v"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
