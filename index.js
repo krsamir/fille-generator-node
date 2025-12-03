@@ -68,17 +68,13 @@ yargs.command({
     try {
       logger.info(\`${service}.${name} called :\`);
       const data = await ${SERVICE_NAME}.${name}({});
-      if (data === 1) {
+      if (data) {
         return res.status(RESPONSE_STATUS.OK_200).send({
           message: "",
           status: CONSTANTS.STATUS.SUCCESS,
+          data
         });
-      } else {
-        return res.status(RESPONSE_STATUS.OK_200).send({
-          message: "",
-          status: CONSTANTS.STATUS.FAILURE,
-        });
-      }
+      } 
     } catch (error) {
       logger.error(\`
         ${service}.${name}: Error occurred : \${inspect(error)}\`
@@ -142,7 +138,6 @@ yargs.command({
       [Segments.BODY]: Joi.object({
         id: Joi.string().required(),
         email: Joi.string().required(),
-        email: Joi.string().optional().allow("").allow(null),
         isActive: Joi.number().optional().allow(null),
       }),
     };
